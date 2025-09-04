@@ -1,7 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
 const { parseUserLine, parseUserObj } = require("./parse");
-
 const PATH = path.join(__dirname, "../user.txt");
 
 exports.getUsers = async () => {

@@ -11,7 +11,11 @@ router.get(ROUTE, (req, res, next) => {
   return userController.getUsers(req, res, next);
 });
 
-router.post(ROUTE, userController.createUser);
-router.delete(ROUTE, userController.deleteUserById);
+router.post(ROUTE, (req, res, next) =>
+  userController.createUser(req, res, next)
+);
+router.delete(ROUTE, (req, res, next) =>
+  userController.deleteUserById(req, res, next)
+);
 
 module.exports = router;
