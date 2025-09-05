@@ -6,4 +6,5 @@ exports.handleLogs = async (req, res, next) => {
   } catch (err) {
     throw new Error(err.message);
   }
+  next();
 };
