@@ -1,34 +1,14 @@
 const { createResponse } = require("./createResponse");
 
-function formateError(e) {
-  let err = [];
-  let message = "";
-  if (!e) {
-    err.push["Invalid Request"];
-    message = "Invalid Request";
-  }
-  if (typeof e === "string") {
-    err.push[e.message];
-    message = e.message;
-  }
-  if (typeof e === "object") {
-    err.push[e.message];
-    err.push[e.name];
-    message = e.message;
-  }
-  return {
-    message,
-    error: err,
-  };
-}
 exports.handleError = (err, req, res, next) => {
-  const errData = formateError(err);
+  const status = err.status || 500;
+
   createResponse(
     {
-      status: err.status || 500,
+      status,
       data: null,
-      error: errData.error,
-      message: errData.message,
+      error: err.details || [err.message || "Something went wrong"],
+      message: err.message || "Error",
       success: false,
     },
     res

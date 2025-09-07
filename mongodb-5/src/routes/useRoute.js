@@ -5,12 +5,11 @@ const {
   createTodo,
   updateTodo,
   deleteTodo,
-} = require("../controllers/todoController");
-const { validate } = require("../middleware/validate");
-router.use(validate);
-router.get("/", getTodos); //get
-router.post("/", createTodo); //get
-router.delete("/:id", deleteTodo); //get
+} = require("../controllers/todosController");
+
+router.get("/", getTodos);
+router.post("/", createTodo);
+router.delete("/:id", deleteTodo);
 router.put("/:id", updateTodo);
 
-module.exports = router;
+module.exports = router; 
