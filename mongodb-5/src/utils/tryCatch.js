@@ -1,4 +1,4 @@
-const { handleError } = require("./handleError");
+const handleError = require("./handleError");
 
 exports.tryCatch = (fn) => {
   return function (req, res, next) {

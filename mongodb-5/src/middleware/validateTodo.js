@@ -1,4 +1,4 @@
-exports.validate = (req, res, next) => {
+function validateTodo(req, res, next) {
   let err = [];
 
   if (req.method === "POST") {
@@ -48,4 +48,6 @@ exports.validate = (req, res, next) => {
     return next(err);
   }
   next();
-};
+}
+
+module.exports = validateTodo;

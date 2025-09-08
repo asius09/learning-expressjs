@@ -1,6 +1,6 @@
 const { tryCatch } = require("../utils/tryCatch");
 const Todo = require("../schema/todo.schema");
-const { createResponse } = require("../utils/createResponse");
+const createResponse = require("../utils/createResponse");
 
 exports.getTodos = tryCatch(async (req, res, next) => {
   const todoId = req.params.id;

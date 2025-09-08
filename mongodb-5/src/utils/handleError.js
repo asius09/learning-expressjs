@@ -1,16 +1,23 @@
-const { createResponse } = require("./createResponse");
+const createResponse = require("./createResponse");
 
-exports.handleError = (err, req, res, next) => {
+function handleError(err, req, res, next) {
   const status = err.status || 500;
+  const errorDetails =
+    err.details ||
+    (err.message
+      ? [{ message: err.message }]
+      : [{ message: "Something went wrong" }]);
 
   createResponse(
     {
       status,
       data: null,
-      error: err.details || [err.message || "Something went wrong"],
-      message: err.message || "Error",
+      error: errorDetails,
+      message: err.message || "An unexpected error occurred.",
       success: false,
     },
     res
   );
-};
+}
+
+module.exports = handleError;
