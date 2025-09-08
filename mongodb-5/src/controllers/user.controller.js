@@ -1,5 +1,5 @@
 const User = require("../schema/user.schema");
-const { tryCatch } = require("../utils/tryCatch");
+const tryCatch = require("../utils/tryCatch");
 const createToken = require("../utils/createToken");
 const createResponse = require("../utils/createResponse");
 require("dotenv").config();

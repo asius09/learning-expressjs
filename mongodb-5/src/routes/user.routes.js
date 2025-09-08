@@ -6,11 +6,10 @@ const {
   getUsers,
 } = require("../controllers/user.controller");
 const validateUser = require("../middleware/validateUser");
-const verifyToken = require("../middleware/verifyToken");
 
 router.get("/", getUsers);
-router.use(verifyToken);
 router.use(validateUser);
+
 router.post("/signup", handleSignup);
 router.post("/login", handleLogin);
 router.all("/", (req, res, next) => {

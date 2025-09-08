@@ -1,4 +1,4 @@
-const { tryCatch } = require("../utils/tryCatch");
+const tryCatch = require("../utils/tryCatch");
 const Todo = require("../schema/todo.schema");
 const createResponse = require("../utils/createResponse");
 
@@ -10,8 +10,9 @@ exports.getTodos = tryCatch(async (req, res, next) => {
     response = await Todo.findById(todoId);
     message = `Todo with ID ${todoId}`;
   } else {
-    response = await Todo.find();
-    message = "All Todos";
+    const { user_id } = req.body;
+    response = await Todo.find({ user_id });
+    message = `Todos for user ${user_id}`;
   }
 
   if (response && response.length !== 0) {

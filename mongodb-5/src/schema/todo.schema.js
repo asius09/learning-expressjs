@@ -10,6 +10,11 @@ const TodoSchema = new Schema(
       trim: true,
     },
     completed: { type: Boolean, default: false },
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "User ID is required"],
+    },
   },
   { timestamps: true }
 );

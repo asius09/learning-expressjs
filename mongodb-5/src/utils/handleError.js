@@ -3,10 +3,7 @@ const createResponse = require("./createResponse");
 function handleError(err, req, res, next) {
   const status = err.status || 500;
   const errorDetails =
-    err.details ||
-    (err.message
-      ? [{ message: err.message }]
-      : [{ message: "Something went wrong" }]);
+    err.details || (err.message ? [err.message] : ["Something went wrong"]);
 
   createResponse(
     {

@@ -1,52 +1,44 @@
+function validateTitleAndCompleted(title, completed, errors) {
+  if (title === undefined || title === null || title === "") {
+    errors.push("Invalid Request: Todo Title Required");
+  } else if (typeof title !== "string") {
+    errors.push("TypeError: Title should be string");
+  }
+  if (completed === undefined || completed === null) {
+    errors.push("Invalid Request: Completed Status Required");
+  } else if (typeof completed !== "boolean") {
+    errors.push("TypeError: Completed should be boolean");
+  }
+}
+
 function validateTodo(req, res, next) {
-  let err = [];
+  let errors = [];
+  const method = req.method;
+  const todoId = req.params.id;
+  const { user_id } = req.body;
 
-  if (req.method === "POST") {
+  if (!user_id) {
+    const error = new Error("Invalid Request: User ID should be provided.");
+    error.status = 400;
+    return next(error);
+  }
+
+  if ((method === "PUT" || method === "DELETE") && !todoId) {
+    errors.push("Invalid Request: Todo ID Required");
+  }
+
+  if (method === "POST" || method === "PUT") {
     const { title, completed } = req.body;
-
-    if (!title) err.push("Invalid Request: Todo Title Required");
-    if (typeof title !== "string")
-      err.push("TypeError: Title should be string");
-
-    if (completed === undefined)
-      err.push("Invalid Request: Completed Status Required");
-    if (typeof completed !== "boolean")
-      err.push("TypeError: Completed should be boolean");
+    validateTitleAndCompleted(title, completed, errors);
   }
 
-  if (req.method === "PUT") {
-    const todoId = req.params.id;
-    if (!todoId) err.push("Invalid Request: Todo ID Required");
-    const { title, completed } = req.body;
-    if (!title || !completed)
-      err.push(
-        "Invalid Request! Update field Required either title or completed"
-      );
-    if (title) {
-      if (!title) err.push("Invalid Request: Todo Title Required");
-      if (typeof title !== "string")
-        err.push("TypeError: Title should be string");
-    }
-    if (completed) {
-      if (completed === undefined)
-        err.push("Invalid Request: Completed Status Required");
-      if (typeof completed !== "boolean")
-        err.push("TypeError: Completed should be boolean");
-    }
+  if (errors.length > 0) {
+    const error = new Error("Validation failed");
+    error.status = 400;
+    error.details = errors;
+    return next(error);
   }
 
-  if (req.method === "DELETE") {
-    const todoId = req.params.id;
-    if (!todoId) err.push("Invalid Request: Todo ID Required");
-  }
-
-  if (err.length > 0) {
-    // Create an error object and pass to next
-    const error = new Error("Invalid Request");
-    error.status = 400; // Bad Request
-    error.details = err;
-    return next(err);
-  }
   next();
 }
 

@@ -7,6 +7,7 @@ const todoRoutes = require("./src/routes/todo.routes");
 const userRoutes = require("./src/routes/user.routes");
 const connectDB = require("./db");
 const logger = require("./src/middleware/logger");
+const verifyToken = require("./src/middleware/verifyToken");
 const TODO_ROUTE = "/todos";
 const USER_ROUTE = "/users";
 const PORT = process.env.PORT;
@@ -19,6 +20,7 @@ app.use(express.json());
 
 // Custom logger middleware
 app.use(logger);
+app.use(verifyToken);
 
 // Mount user and todo routes
 app.use(USER_ROUTE, userRoutes);

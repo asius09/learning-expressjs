@@ -7,13 +7,17 @@ const {
   deleteTodo,
 } = require("../controllers/todos.controller");
 const validateTodo = require("../middleware/validateTodo");
+const verifyUserById = require("../middleware/verifyUserById");
 
 router.use(validateTodo);
+router.use(verifyUserById);
 
 router.get("/", getTodos);
+router.get("/:id", getTodos);
 router.post("/", createTodo);
 router.delete("/:id", deleteTodo);
 router.put("/:id", updateTodo);
+
 router.all("/", (req, res, next) => {
   const error = new Error(`Route ${req.originalUrl} not found`);
   error.status = 404;
