@@ -1,7 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 
-const LOG_PATH = path.join(__dirname, "../../logs/log.txt");
+const LOG_PATH = path.join(__dirname, "../../logs/log.log");
 // Logger Function
 async function logger(req, res, next) {
   const method = req.method;

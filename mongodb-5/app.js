@@ -1,10 +1,14 @@
 const express = require("express");
+const morgan = require("morgan");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
+
 const handleError = require("./src/utils/handleError");
-const app = express();
 const todoRoutes = require("./src/routes/todo.routes");
 const userRoutes = require("./src/routes/user.routes");
+const app = express();
 const connectDB = require("./db");
 const logger = require("./src/middleware/logger");
 const verifyToken = require("./src/middleware/verifyToken");
@@ -17,6 +21,17 @@ connectDB();
 app.use(cookieParser());
 // Middleware to parse JSON
 app.use(express.json());
+
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :req[user-agent] :total-time :user-agent",
+    {
+      stream: fs.createWriteStream(path.join(__dirname, "logs/access.log"), {
+        flags: "a",
+      }),
+    }
+  )
+);
 
 // Custom logger middleware
 app.use(logger);
