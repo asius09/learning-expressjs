@@ -20,10 +20,11 @@ app.use(express.json());
 
 // Custom logger middleware
 app.use(logger);
-app.use(verifyToken);
 
 // Mount user and todo routes
 app.use(USER_ROUTE, userRoutes);
+
+app.use(verifyToken);
 app.use(TODO_ROUTE, todoRoutes);
 
 // Handle undefined routes (all methods, all paths)

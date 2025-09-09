@@ -5,15 +5,11 @@ const DB_URL = process.env.DB_URL;
 
 async function connectDB() {
   try {
-    console.log("Connecting to Database...");
-    await mongoose.connect(DB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(DB_URL);
     console.log("MongoDB Connected");
   } catch (err) {
     console.error("MongoDB connection error:", err.message);
-    process.exit(1); // Exit if DB connection fails
+    process.exit(1);
   }
 }
 
