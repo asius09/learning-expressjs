@@ -15,6 +15,7 @@ const logger = require("./src/middleware/logger");
 const verifyToken = require("./src/middleware/verifyToken");
 const mycors = require("./src/middleware/cors");
 const limiter = require("./src/middleware/limiter");
+const verifyRefreshToken = require("./src/middleware/verifyRefreshToken");
 
 const app = express();
 const TODO_ROUTE = "/todos";
@@ -50,7 +51,7 @@ app.use(logger);
 
 // Mount user and todo routes
 app.use(USER_ROUTE, userRoutes);
-
+app.use(verifyRefreshToken);
 app.use(verifyToken);
 app.use(TODO_ROUTE, todoRoutes);
 

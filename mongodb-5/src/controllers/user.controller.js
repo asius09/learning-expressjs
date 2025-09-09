@@ -71,9 +71,11 @@ exports.handleLogin = tryCatch(async (req, res, next) => {
     );
   }
 
+  const refreshToken = foundUser.createRefreshToken();
+
   const token = createToken({
     id: foundUser._id,
-    tokenVersion: foundUser.tokenVersion,
+    tokenVersion: foundUser.tokenVersion + 1,
   });
 
   createResponse(
@@ -84,6 +86,44 @@ exports.handleLogin = tryCatch(async (req, res, next) => {
       error: null,
       message: "Login successful. Welcome back!",
       token,
+      refreshToken,
+    },
+    res
+  );
+});
+
+exports.handleLogOut = tryCatch(async (req, res, next) => {
+  const userId = req.params.id;
+
+  if (!userId) {
+    console.error("Invalid Request! User Id is required");
+    const error = new Error("Invalid Request! User Id is required");
+    error.status = 400;
+    return next(error);
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    console.error("User not found for logout, id:", userId);
+    const error = new Error("User not found");
+    error.status = 400;
+    return next(error);
+  }
+
+  // Invalidate the user's refresh token by setting it to null and incrementing tokenVersion
+  user.refreshToken = null;
+  user.tokenVersion = (user.tokenVersion || 0) + 1;
+  await user.save();
+
+  createResponse(
+    {
+      status: 200,
+      data: null,
+      success: true,
+      error: null,
+      message: "Logged out successfully.",
+      clearCookies: true,
     },
     res
   );

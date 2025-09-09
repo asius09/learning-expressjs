@@ -3,7 +3,7 @@ const createResponse = require("../utils/createResponse");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 50,
   handler: (req, res, next) => {
     createResponse(
       {

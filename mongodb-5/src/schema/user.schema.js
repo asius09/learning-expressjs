@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-const SALT_ROUND = 10;
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const EXPIRY = process.env.JWT_REFRESH_EXPIRES_IN;
+const SALT_ROUND = process.env.SALT_ROUND;
 //create schema
 const UserSchema = new mongoose.Schema(
   {
@@ -28,6 +32,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -44,6 +52,20 @@ UserSchema.pre("save", async function (next) {
 
 UserSchema.methods.checkPassword = async function (userPassword) {
   return bcrypt.compare(userPassword, this.password);
+};
+
+UserSchema.methods.createRefreshToken = function () {
+  const refreshToken = jwt.sign(
+    {
+      id: this._id,
+      tokenVersion: this.tokenVersion + 1,
+    },
+    REFRESH_SECRET,
+    { expiresIn: EXPIRY }
+  );
+  this.tokenVersion += 1;
+  this.refreshToken = refreshToken;
+  return refreshToken;
 };
 
 UserSchema.methods.changePasswordAfter = function (timestamp) {

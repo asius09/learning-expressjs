@@ -4,12 +4,14 @@ const {
   handleLogin,
   handleSignup,
   getUsers,
+  handleLogOut,
 } = require("../controllers/user.controller");
 const validateUser = require("../middleware/validateUser");
 const verifyToken = require("../middleware/verifyToken");
+const verifyRefreshToken = require("../middleware/verifyRefreshToken");
 
+router.post("/logout/:id", verifyToken, handleLogOut);
 router.use(validateUser);
-
 router.post("/signup", handleSignup);
 router.post("/login", handleLogin);
 
