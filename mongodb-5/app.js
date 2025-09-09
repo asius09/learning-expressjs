@@ -1,17 +1,19 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
 const cookieParser = require("cookie-parser");
 
 const handleError = require("./src/utils/handleError");
 const todoRoutes = require("./src/routes/todo.routes");
 const userRoutes = require("./src/routes/user.routes");
-const app = express();
 const connectDB = require("./db");
 const logger = require("./src/middleware/logger");
 const verifyToken = require("./src/middleware/verifyToken");
+const cors = require("./src/middleware/cors");
+
+const app = express();
 const TODO_ROUTE = "/todos";
 const USER_ROUTE = "/users";
 const PORT = process.env.PORT;
@@ -21,6 +23,7 @@ connectDB();
 app.use(cookieParser());
 // Middleware to parse JSON
 app.use(express.json());
+app.use(cors);
 
 app.use(
   morgan(
