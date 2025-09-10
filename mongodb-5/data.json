@@ -1,0 +1,20 @@
+[
+  {
+    "email": "itsmeasius@gmail.com",
+    "password": "asius20229",
+    "id": "68c10fc7e629246f612dddff",
+    "role": "user"
+  },
+  {
+    "id": "68c10fefe629246f612dde01",
+    "email": "adiba@gmail.com",
+    "password": "asius20229",
+    "role": "user"
+  },
+  {
+    "id": "68c11035e629246f612dde03",
+    "email": "adibafiroz@gmail.com",
+    "password": "asius20229",
+    "role": "admin"
+  }
+]

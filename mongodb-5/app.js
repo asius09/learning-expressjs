@@ -1,8 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const morgan = require("morgan");
-const fs = require("fs");
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -16,54 +13,41 @@ const verifyToken = require("./src/middleware/verifyToken");
 const mycors = require("./src/middleware/cors");
 const limiter = require("./src/middleware/limiter");
 const verifyRefreshToken = require("./src/middleware/verifyRefreshToken");
+const errorHandler = require("./src/middleware/errorHandler");
+const createMorganLogger = require("./src/middleware/createMorganLogger");
 
 const app = express();
 const TODO_ROUTE = "/todos";
 const USER_ROUTE = "/users";
 const PORT = process.env.PORT;
 
-// Connect to the database
 connectDB();
 app.use(helmet());
 
 app.use(cookieParser());
-// Middleware to parse JSON
 app.use(express.json());
-app.use(cors());
 
+app.use(cors());
 app.use(mycors);
 
 app.use(limiter);
-
-app.use(
-  morgan(
-    ":method :url :status :res[content-length] - :response-time ms :req[user-agent] :total-time :user-agent",
-    {
-      stream: fs.createWriteStream(path.join(__dirname, "logs/access.log"), {
-        flags: "a",
-      }),
-    }
-  )
-);
-
-// Custom logger middleware
+app.use(createMorganLogger());
 app.use(logger);
 
-// Mount user and todo routes
+
 app.use(USER_ROUTE, userRoutes);
+
 app.use(verifyRefreshToken);
 app.use(verifyToken);
 app.use(TODO_ROUTE, todoRoutes);
 
 // Handle undefined routes (all methods, all paths)
 app.all("/", (req, res, next) => {
-  const error = new Error(`Route ${req.originalUrl} not found`);
-  error.status = 404;
-  next(error);
+  handleError(`Route ${req.originalUrl} not found`, 404, next);
 });
 
 // Centralized error handling middleware
-app.use(handleError);
+app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => {

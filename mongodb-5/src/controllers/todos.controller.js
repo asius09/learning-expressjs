@@ -4,11 +4,29 @@ const createResponse = require("../utils/createResponse");
 
 exports.getTodos = tryCatch(async (req, res, next) => {
   const todoId = req.params.id;
+  const { page, limit } = req.query;
   let response, message;
 
   if (todoId) {
     response = await Todo.findById(todoId);
     message = `Todo with ID ${todoId}`;
+  } else if (page) {
+    const defaultLimit = parseInt(limit) || 10;
+
+    const parsedPage = parseInt(page);
+
+    const skip = (parsedPage - 1) * defaultLimit;
+
+    const todos = await Todo.find()
+      .skip(skip)
+      .limit(defaultLimit)
+      .sort({ createAt: -1 });
+
+    response = {
+      page: parsedPage,
+      limit: defaultLimit,
+      data: todos,
+    };
   } else {
     const { user_id } = req.body;
     response = await Todo.find({ user_id });

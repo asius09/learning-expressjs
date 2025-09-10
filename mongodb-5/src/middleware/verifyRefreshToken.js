@@ -18,7 +18,6 @@ const verifyRefreshToken = tryCatch(async (req, res, next) => {
   try {
     const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
     req.refresh = decoded;
-    console.log("Refresh Token: ", decoded);
     next();
   } catch (err) {
     console.error("Invalid or expired refresh token.", err);

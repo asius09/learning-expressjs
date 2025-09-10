@@ -19,9 +19,7 @@ router.delete("/:id", deleteTodo);
 router.put("/:id", updateTodo);
 
 router.all("/", (req, res, next) => {
-  const error = new Error(`Route ${req.originalUrl} not found`);
-  error.status = 404;
-  next(error);
+  handleError(`Route ${req.originalUrl} not found`, 404, next);
 });
 
 module.exports = router;

@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const EXPIRY = process.env.JWT_REFRESH_EXPIRES_IN;
-const SALT_ROUND = process.env.SALT_ROUND;
+const SALT_ROUND = parseInt(process.env.SALT_ROUND);
 //create schema
 const UserSchema = new mongoose.Schema(
   {
