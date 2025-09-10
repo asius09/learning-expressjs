@@ -2,37 +2,41 @@ const User = require("../schema/user.schema");
 const tryCatch = require("../utils/tryCatch");
 const createToken = require("../utils/createToken");
 const createResponse = require("../utils/createResponse");
+const handleError = require("../utils/handleError");
 require("dotenv").config();
+
+const checkIsAdmin = async (userId, next) => {
+  const foundUser = await User.findById(userId);
+
+  if (!foundUser) {
+    return handleError("No users found in the database.", 404, next);
+  }
+
+  return foundUser.role === "admin";
+};
 
 exports.handleSignup = tryCatch(async (req, res, next) => {
   const user = await User.create(req.body);
 
   if (!user) {
-    return createResponse(
-      {
-        status: 500,
-        data: null,
-        success: false,
-        error: { message: "User creation failed" },
-        message: "Something went wrong during signup.",
-      },
-      res
-    );
+    return handleError("User creation failed", 500, next);
   }
 
+  const refreshToken = user.createRefreshToken();
   const token = createToken({
     id: user._id,
-    tokenVersion: user.tokenVersion,
+    tokenVersion: user.tokenVersion + 1,
   });
 
   createResponse(
     {
       status: 201,
-      data: { id: user._id, email: user.email },
+      data: { id: user._id, email: user.email, role: user.role },
       success: true,
       error: null,
-      message: "Signup successful. Welcome!",
+      message: "Signup successful. You are now logged in!",
       token,
+      refreshToken,
     },
     res
   );
@@ -44,31 +48,17 @@ exports.handleLogin = tryCatch(async (req, res, next) => {
   const foundUser = await User.findOne({ email }).select("+password");
 
   if (!foundUser) {
-    return createResponse(
-      {
-        status: 404,
-        data: null,
-        success: false,
-        error: { message: "No user found" },
-        message: "No user found with this email. Please sign up.",
-      },
-      res
+    return handleError(
+      "No user found with this email. Please sign up.",
+      404,
+      next
     );
   }
 
   const ok = await foundUser.checkPassword(password);
 
   if (!ok) {
-    return createResponse(
-      {
-        status: 400,
-        data: null,
-        success: false,
-        error: { message: "Incorrect password" },
-        message: "Incorrect password. Please try again.",
-      },
-      res
-    );
+    return handleError("Incorrect password. Please try again.", 400, next);
   }
 
   const refreshToken = foundUser.createRefreshToken();
@@ -81,7 +71,7 @@ exports.handleLogin = tryCatch(async (req, res, next) => {
   createResponse(
     {
       status: 200,
-      data: { id: foundUser._id, email: foundUser.email },
+      data: { id: foundUser._id, email: foundUser.email, role: foundUser.role },
       success: true,
       error: null,
       message: "Login successful. Welcome back!",
@@ -96,19 +86,13 @@ exports.handleLogOut = tryCatch(async (req, res, next) => {
   const userId = req.params.id;
 
   if (!userId) {
-    console.error("Invalid Request! User Id is required");
-    const error = new Error("Invalid Request! User Id is required");
-    error.status = 400;
-    return next(error);
+    return handleError("Invalid Request! User Id is required", 400, next);
   }
 
   const user = await User.findById(userId);
 
   if (!user) {
-    console.error("User not found for logout, id:", userId);
-    const error = new Error("User not found");
-    error.status = 400;
-    return next(error);
+    return handleError("User not found", 400, next);
   }
 
   // Invalidate the user's refresh token by setting it to null and incrementing tokenVersion
@@ -130,20 +114,20 @@ exports.handleLogOut = tryCatch(async (req, res, next) => {
 });
 
 exports.getUsers = tryCatch(async (req, res, next) => {
-  // TODO: show only for admin
-  const users = await User.find();
-  if (!users) {
-    return createResponse(
-      {
-        status: 404,
-        data: null,
-        success: false,
-        error: { message: "No users found" },
-        message: "No users found in the database.",
-      },
-      res
-    );
+  const userId = req.params.id;
+
+  if (!userId) {
+    return handleError("Invalid Request! User Id is required", 400, next);
   }
+
+  const isAdmin = await checkIsAdmin(userId, next);
+
+  if (!isAdmin) {
+    return handleError("Unauthorized Request", 401, next);
+  }
+
+  const users = await User.find();
+
   createResponse(
     {
       status: 200,
